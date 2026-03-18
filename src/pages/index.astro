@@ -3,109 +3,356 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Socials from "@/components/Socials.astro";
-import LinkButton from "@/components/LinkButton.astro";
-import Card from "@/components/Card.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
-import IconRss from "@/assets/icons/IconRss.svg";
-import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import { getPath } from "@/utils/getPath";
 import { SITE } from "@/config";
-import { SOCIALS } from "@/constants";
+import { PROFILE } from "@/data/profile";
+import { EXPERIENCE } from "@/data/experience";
 
-const posts = await getCollection("blog");
+// Blog posts — latest 5
+const allPosts = await getCollection("blog");
+const recentPosts = getSortedPosts(allPosts).slice(0, 5);
 
-const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+// Projects — featured first, up to 5
+const allProjects = await getCollection("projects", ({ data }) => !data.draft);
+const featuredProjects = allProjects
+  .sort(
+    (a, b) =>
+      Number(b.data.featured ?? false) - Number(a.data.featured ?? false)
+  )
+  .slice(0, 5);
+
+// GitHub public repo count — fetch at build time, fail gracefully
+let githubRepos = 0;
+try {
+  const res = await fetch("https://api.github.com/users/FreddieKT");
+  if (res.ok) {
+    const data = await res.json();
+    githubRepos = data.public_repos ?? 0;
+  }
+} catch {
+  // no-op — not critical
+}
 ---
 
-<Layout>
+<Layout
+  title={`${SITE.title} | ${PROFILE.name}`}
+  description={PROFILE.bio}
+  ogImage="/images/profile.webp"
+>
   <Header />
-  <main id="main-content" data-layout="index" class="app-layout">
-    <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        Mingalaba
-      </h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="inline-block"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <IconRss
-          width={20}
-          height={20}
-          class="scale-125 stroke-accent stroke-3 rtl:-rotate-90"
-        />
-        <span class="sr-only">RSS Feed</span>
-      </a>
+  <main id="main-content" data-layout="index" class="app-layout pb-16">
+    <!-- ── Hero ── -->
+    <section id="hero" class="border-b border-border py-10 sm:py-14">
+      <div class="grid gap-8 md:grid-cols-[160px_1fr] md:items-start">
+        <a href="/about" class="mx-auto block w-28 shrink-0 sm:mx-0 sm:w-40">
+          <img
+            src={PROFILE.avatar}
+            alt={PROFILE.name}
+            fetchpriority="high"
+            width="160"
+            height="160"
+            class="h-auto w-full object-cover object-top"
+          />
+        </a>
 
-      <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
-      </p>
-      <p class="mt-2">
-        Read the blog posts or check
-        <LinkButton
-          class="underline decoration-dashed underline-offset-4 hover:text-accent"
-          href="https://github.com/satnaing/astro-paper#readme"
-        >
-          README
-        </LinkButton> for more info.
-      </p>
-      {
-        // only display if at least one social link is enabled
-        SOCIALS.length > 0 && (
-          <div class="mt-4 flex max-sm:flex-col sm:items-center">
-            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">Social Links:</div>
-            <Socials />
+        <div class="min-w-0 text-center md:text-left">
+          <p
+            class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
+          >
+            Portfolio
+          </p>
+          <h1 class="mt-3 text-3xl font-semibold sm:text-4xl">
+            {PROFILE.title}
+          </h1>
+          <p class="mt-4 text-[var(--text-muted)]">{PROFILE.bio}</p>
+
+          <div
+            class="mt-5 flex flex-wrap justify-center gap-2 md:justify-start"
+          >
+            <span
+              class="rounded-full border border-border px-3 py-1 text-xs text-[var(--text-muted)]"
+              >{PROFILE.yearsBuilding}+ years building</span
+            >
+            <span
+              class="rounded-full border border-border px-3 py-1 text-xs text-[var(--text-muted)]"
+              >{featuredProjects.length} projects</span
+            >
+            {
+              githubRepos > 0 && (
+                <span class="rounded-full border border-border px-3 py-1 text-xs text-[var(--text-muted)]">
+                  {githubRepos} public repos
+                </span>
+              )
+            }
           </div>
-        )
-      }
+
+          <div
+            class="mt-6 flex flex-wrap justify-center gap-3 md:justify-start"
+          >
+            <a
+              href={PROFILE.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="rounded-full bg-accent px-5 py-2 text-sm font-medium text-background hover:opacity-90"
+            >
+              View GitHub
+            </a>
+            <a
+              href="#contact"
+              class="rounded-full border border-border px-5 py-2 text-sm font-medium hover:border-accent hover:text-accent"
+            >
+              Contact me
+            </a>
+          </div>
+
+          <div
+            class="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-[var(--text-muted)] md:justify-start"
+          >
+            <a
+              href={PROFILE.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-accent">GitHub</a
+            >
+            <a
+              href={PROFILE.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-accent">X</a
+            >
+            <a
+              href={PROFILE.kaggle}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-accent">Kaggle</a
+            >
+            <a href={`mailto:${PROFILE.email}`} class="hover:text-accent"
+              >Email</a
+            >
+          </div>
+        </div>
+      </div>
     </section>
 
-    {
-      featuredPosts.length > 0 && (
-        <section
-          id="featured"
-          class:list={[
-            "pt-12 pb-6",
-            { "border-b border-border": recentPosts.length > 0 },
-          ]}
+    <!-- ── Projects ── -->
+    <section id="work" class="border-b border-border py-12">
+      <p
+        class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
+      >
+        Projects
+      </p>
+      <h2 class="mt-2 text-2xl font-semibold sm:text-3xl">Selected work</h2>
+      <p class="mt-3 max-w-2xl text-[var(--text-muted)]">
+        A small set of products, experiments, and tools I've built or kept
+        improving.
+      </p>
+
+      <ul class="mt-8 divide-y divide-border">
+        {
+          featuredProjects.map(project => (
+            <li class="py-6 first:pt-0">
+              <a
+                href={`/projects/${project.id}`}
+                class="text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
+              >
+                {project.data.title}
+              </a>
+              <div class="mt-1 flex flex-wrap gap-2">
+                <span class="rounded-full border border-border px-2 py-0.5 text-xs text-[var(--text-muted)]">
+                  {project.data.category}
+                </span>
+                {project.data.technologies.slice(0, 3).map(tech => (
+                  <span class="rounded-full border border-border px-2 py-0.5 text-xs text-[var(--text-muted)]">
+                    {tech}
+                  </span>
+                ))}
+              </div>
+              <p class="mt-2 max-w-2xl text-sm text-[var(--text-muted)]">
+                {project.data.description}
+              </p>
+              <div class="mt-2 flex gap-4 text-sm">
+                {project.data.link && (
+                  <a
+                    href={project.data.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent decoration-dashed underline-offset-4 hover:underline"
+                  >
+                    Live ↗
+                  </a>
+                )}
+                {project.data.github && (
+                  <a
+                    href={project.data.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent decoration-dashed underline-offset-4 hover:underline"
+                  >
+                    Code ↗
+                  </a>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-6">
+        <a
+          href="/projects"
+          class="text-sm font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
         >
-          <h2 class="text-2xl font-semibold tracking-wide">Featured</h2>
-          <ul>
-            {featuredPosts.map(data => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
+          All projects →
+        </a>
+      </div>
+    </section>
 
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">Recent Posts</h2>
-          <ul>
-            {recentPosts.map(
-              (data, index) =>
-                index < SITE.postPerIndex && <Card variant="h3" {...data} />
-            )}
-          </ul>
-        </section>
-      )
-    }
+    <!-- ── Writing ── -->
+    <section id="notes" class="border-b border-border py-12">
+      <p
+        class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
+      >
+        Writing
+      </p>
+      <h2 class="mt-2 text-2xl font-semibold sm:text-3xl">
+        Notes and learnings
+      </h2>
+      <p class="mt-3 max-w-2xl text-[var(--text-muted)]">
+        Writing about things I tried, what worked, and what I would do
+        differently next time.
+      </p>
 
-    <div class="my-8 text-center">
-      <LinkButton href="/posts/">
-        All Posts
-        <IconArrowRight class="inline-block rtl:-rotate-180" />
-      </LinkButton>
-    </div>
+      <ul class="mt-8 divide-y divide-border">
+        {
+          recentPosts.map(post => (
+            <li class="py-6 first:pt-0">
+              <a
+                href={getPath(post.id, post.filePath)}
+                class="text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
+              >
+                {post.data.title}
+              </a>
+              <div class="mt-1 flex flex-wrap gap-2">
+                <span class="rounded-full border border-border px-2 py-0.5 text-xs text-[var(--text-muted)]">
+                  {post.data.pubDatetime.toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+                {post.data.tags.slice(0, 2).map(tag => (
+                  <a
+                    href={`/tags/${tag}`}
+                    class="rounded-full border border-border px-2 py-0.5 text-xs text-[var(--text-muted)] hover:border-accent hover:text-accent"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+              <p class="mt-2 max-w-2xl text-sm text-[var(--text-muted)]">
+                {post.data.description}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-6">
+        <a
+          href="/posts"
+          class="text-sm font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
+        >
+          All posts →
+        </a>
+      </div>
+    </section>
+
+    <!-- ── About preview ── -->
+    <section id="about-preview" class="border-b border-border py-12">
+      <p
+        class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
+      >
+        About
+      </p>
+      <h2 class="mt-2 text-2xl font-semibold sm:text-3xl">How I work</h2>
+
+      <div class="mt-6 grid gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <div class="space-y-4 text-sm leading-relaxed">
+          <p>{PROFILE.bio}</p>
+          <p class="text-[var(--text-muted)]">
+            Most of my work starts as a real need: a workflow I want to
+            simplify, a product idea I want to test, or a small tool I would
+            actually use myself.
+          </p>
+          <p class="text-[var(--text-muted)]">
+            This portfolio is meant to show that process clearly without turning
+            everything into a case study.
+          </p>
+        </div>
+
+        <div
+          class="rounded-lg border border-border bg-[var(--panel)] p-5 text-sm"
+        >
+          <p
+            class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
+          >
+            Current focus
+          </p>
+          <ul class="mt-4 space-y-4">
+            {
+              EXPERIENCE.slice(0, 3).map(item => (
+                <li>
+                  <p class="text-xs text-[var(--text-muted)]">{item.year}</p>
+                  <p class="mt-0.5 font-medium">{item.role}</p>
+                  <p class="text-xs text-[var(--text-muted)]">{item.company}</p>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-5">
+            <a
+              href="/about"
+              class="text-sm font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
+            >
+              Read the full about page →
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Contact ── -->
+    <section id="contact" class="py-12">
+      <p
+        class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
+      >
+        Contact
+      </p>
+      <h2 class="mt-2 text-2xl font-semibold sm:text-3xl">Get in touch</h2>
+      <p class="mt-3 max-w-2xl text-[var(--text-muted)]">
+        If you want to talk about a project, an idea, or something I should
+        explore, send a message.
+      </p>
+
+      <div
+        class="mt-6 rounded-lg border border-border bg-[var(--panel)] p-6 text-sm"
+      >
+        <p class="text-[var(--text-muted)]">
+          Questions, collaboration ideas, or a project you want to share. Short
+          messages are completely fine.
+        </p>
+        <a
+          href={`mailto:${PROFILE.email}`}
+          class="mt-4 inline-block rounded-full bg-accent px-5 py-2 text-sm font-medium text-background hover:opacity-90"
+        >
+          Send an email →
+        </a>
+        <p class="mt-4 text-xs text-[var(--text-muted)]">
+          Or reach me directly at {PROFILE.email}
+        </p>
+      </div>
+    </section>
   </main>
   <Footer />
 </Layout>

@@ -1,0 +1,116 @@
+---
+// Web3Forms access key — set PUBLIC_WEB3FORMS_KEY in Vercel env vars
+// Get a free key at https://web3forms.com
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? "";
+---
+
+<form
+  id="contact-form"
+  data-key={accessKey}
+  class="mt-6 flex flex-col gap-3"
+  novalidate
+>
+  <div class="flex flex-col gap-3 sm:flex-row">
+    <input
+      type="text"
+      name="name"
+      placeholder="Your Name"
+      required
+      class="flex-1 rounded-md border border-border bg-background px-4 py-2 text-sm placeholder:text-[var(--text-muted)] focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none"
+    />
+    <input
+      type="email"
+      name="email"
+      placeholder="Your Email"
+      required
+      class="flex-1 rounded-md border border-border bg-background px-4 py-2 text-sm placeholder:text-[var(--text-muted)] focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none"
+    />
+  </div>
+  <textarea
+    name="message"
+    placeholder="Your Message"
+    rows="5"
+    required
+    class="rounded-md border border-border bg-background px-4 py-2 text-sm placeholder:text-[var(--text-muted)] focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none"
+  ></textarea>
+
+  <div
+    class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <button
+      type="submit"
+      id="contact-submit"
+      class="rounded-full bg-accent px-5 py-2 text-sm font-medium text-background hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      Send
+    </button>
+    <p
+      id="contact-status"
+      class="hidden text-sm text-[var(--text-muted)]"
+      aria-live="polite"
+    >
+    </p>
+  </div>
+</form>
+
+<script>
+  function initContactForm() {
+    const form = document.getElementById("contact-form") as HTMLFormElement;
+    if (!form) return;
+
+    const btn = document.getElementById("contact-submit") as HTMLButtonElement;
+    const status = document.getElementById("contact-status") as HTMLElement;
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+
+      const key = form.dataset.key ?? "";
+      if (!key) {
+        status.textContent =
+          "Contact form is not configured yet. Email me directly.";
+        status.classList.remove("hidden");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      status.classList.add("hidden");
+
+      const formData = new FormData(form);
+      const body = {
+        access_key: key,
+        name: formData.get("name"),
+        email: formData.get("email"),
+        message: formData.get("message"),
+        subject: "New message from ktt.dev",
+      };
+
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          form.reset();
+          status.textContent =
+            "Your note has been sent. I'll get back to you soon.";
+        } else {
+          status.textContent = "Something went wrong. Please try again.";
+        }
+      } catch {
+        status.textContent =
+          "Could not send your message. Try emailing me directly.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send";
+        status.classList.remove("hidden");
+      }
+    });
+  }
+
+  initContactForm();
+  document.addEventListener("astro:after-swap", initContactForm);
+</script>

@@ -4,7 +4,7 @@ run-name: Weekly Content Creator
 on:
   schedule:
     # Every Sunday at 9am
-    - cron: '0 9 * * 0'
+    - cron: "0 9 * * 0"
   workflow_dispatch:
     # Manual trigger
 
@@ -14,18 +14,18 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          
+          node-version: "20"
+
       - name: Create content via ACP Agent
         env:
           OPENCLAW_URL: ${{ vars.OPENCLAW_URL }}
@@ -33,11 +33,11 @@ jobs:
         run: |
           # Generate unique slug
           SLUG="weekly-post-$(date +%Y%m%d)"
-          
+
           # This script calls your OpenClaw ACP to generate content
           cat > /tmp/generate-content.sh << 'SCRIPT'
           #!/bin/bash
-          
+
           # Call OpenClaw to spawn content agent
           RESPONSE=$(curl -s -X POST "$OPENCLAW_URL/api/v1/sessions" \
             -H "Authorization: Bearer $OPENCLAW_TOKEN" \
@@ -57,18 +57,18 @@ jobs:
               
               Output: Just write the full markdown content. Start directly with ---frontmatter and end with the content. Do not include explanations."
             }')
-          
+
           echo "Agent response: $RESPONSE"
           SCRIPT
-          
+
           chmod +x /tmp/generate-content.sh
-          
+
       - name: Create blog post with AI
         run: |
           # Generate unique slug
           SLUG="weekly-post-$(date +%Y%m%d)"
           DATETIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          
+
           # Create the blog post file with placeholder (AI would generate this)
           cat > src/data/blog/${SLUG}.md << EOF
           ---
@@ -78,38 +78,38 @@ jobs:
           tags: ["AI", "productivity", "development"]
           draft: false
           ---
-          
+
           The landscape of software development is evolving rapidly, and AI is at the forefront of this transformation. As developers, we're witnessing a significant shift in how we approach coding, debugging, and problem-solving.
-          
+
           ## The New Developer Toolkit
-          
+
           AI-powered tools have become essential in our daily workflow. From intelligent code completion to automated debugging, these tools are reshaping our productivity in ways we never thought possible.
-          
+
           ## Key Benefits
-          
+
           1. **Faster Prototyping** - Get ideas to code faster than ever before
           2. **Better Code Reviews** - AI-assisted reviews catch issues early
           3. **Learning Acceleration** - Complex concepts explained instantly
-          
+
           ## Looking Ahead
-          
+
           The future of development isn't about AI replacing developers—it's about AI amplifying our capabilities. Those who embrace these tools will have a significant advantage in the evolving tech landscape.
-          
+
           Stay curious, keep building, and let AI be your copilot rather than your replacement.
           EOF
-          
+
           echo "Created: src/data/blog/${SLUG}.md"
-          
+
       - name: Commit and create PR
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
+
           BRANCH="chore/weekly-content-$(date +%Y%m%d)"
           git checkout -b "$BRANCH"
           git add src/data/blog/
           git commit -m "feat: add weekly blog post"
           git push -u origin "$BRANCH"
-          
+
           # Create PR using gh CLI
           gh pr create --title "feat: weekly blog post" --body "Auto-generated weekly content from AI agent"

@@ -9,7 +9,6 @@ import { SITE } from "@/config";
 import { PROFILE } from "@/data/profile";
 import { EXPERIENCE } from "@/data/experience";
 import ContactForm from "@/components/ContactForm.astro";
-import GitHubActivity from "@/components/GitHubActivity.astro";
 
 // Blog posts — latest 5
 const allPosts = await getCollection("blog");
@@ -269,9 +268,6 @@ try {
         </a>
       </div>
     </section>
-
-    <!-- ── GitHub Activity ── -->
-    <GitHubActivity />
 
     <!-- ── About preview ── -->
     <section id="about-preview" class="border-b border-border py-12">

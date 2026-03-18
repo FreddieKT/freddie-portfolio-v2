@@ -1,0 +1,120 @@
+---
+name: Weekly Content Creator
+description: AI-powered weekly blog post generator
+run-name: Weekly Content Creator
+on:
+  schedule:
+    # Every Sunday at 9am
+    - cron: '0 9 * * 0'
+  workflow_dispatch:
+    # Manual trigger
+
+jobs:
+  create-content:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Generate content prompt
+        id: prompt
+        run: |
+          PROMPT=$(cat << 'EOF'
+          You are a content creator. Write a compelling blog post for a developer portfolio.
+          
+          Topics to choose from (pick one):
+          - AI tools and productivity
+          - Web development tips
+          - Learning to code
+          - Side project journey
+          - Tech career advice
+          
+          Requirements:
+          - Title: Catchy, developer-focused
+          - Description: 1-2 sentences
+          - Tags: 2-3 relevant tags
+          - Content: 400-600 words, friendly tone, practical tips
+          - Language: English
+          
+          Output format (markdown):
+          ---
+          title: "Your Title"
+          pubDatetime: ${{ vars.PUBLISH_DATETIME }}
+          description: "Your description"
+          tags: ["tag1", "tag2"]
+          draft: false
+          ---
+          
+          Your content here...
+          EOF
+          echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
+          
+      - name: Call AI to generate content
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # This would call your AI (Claude/GPT) with the prompt
+          # For now, create a sample post structure
+          echo "Blog post would be generated here"
+          
+      - name: Create blog post
+        run: |
+          # Generate unique slug from title
+          SLUG="weekly-post-$(date +%Y%m%d)"
+          
+          # Create the blog post file
+          cat > src/data/blog/${SLUG}.md << 'EOF'
+          ---
+          title: "How AI is Changing the Way Developers Work"
+          pubDatetime: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          description: "Exploring how AI tools are transforming developer productivity and what it means for the future of coding."
+          tags: ["AI", "productivity", "development"]
+          draft: false
+          ---
+          
+          # How AI is Changing the Way Developers Work
+          
+          The landscape of software development is evolving rapidly, and AI is at the forefront of this transformation. As developers, we're witnessing a significant shift in how we approach coding, debugging, and problem-solving.
+          
+          ## The New Developer Toolkit
+          
+          AI-powered tools have become essential in our daily workflow. From code completion to intelligent debugging, these tools are reshaping our productivity.
+          
+          ## Key Benefits
+          
+          1. **Faster Prototyping** - Get ideas to code faster
+          2. **Better Code Reviews** - AI-assisted reviews catch issues early
+          3. **Learning Acceleration** - Explain complex concepts instantly
+          
+          ## Looking Ahead
+          
+          The future of development isn't about AI replacing developers—it's about AI amplifying our capabilities. Those who embrace these tools will have a significant advantage.
+          
+          Stay curious, keep building, and let AI be your copilot rather than your replacement.
+          EOF
+          
+          echo "Created blog post: ${SLUG}.md"
+          
+      - name: Commit and create PR
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git checkout -b chore/weekly-content-$(date +%Y%m%d)
+          git add src/data/blog/
+          git commit -m "feat: add weekly blog post"
+          git push -u origin chore/weekly-content-$(date +%Y%m%d)
+          
+          # Create PR using gh CLI
+          gh pr create --title "feat: weekly blog post" --body "Auto-generated weekly content"

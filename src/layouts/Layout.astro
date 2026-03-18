@@ -61,9 +61,13 @@ const structuredData = {
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Load Font -->
+    <!-- Load Fonts -->
     <Font
-      cssVariable="--font-google-sans-code"
+      cssVariable="--font-sans"
+      preload={[{ subset: "latin", weight: 400, style: "normal" }]}
+    />
+    <Font
+      cssVariable="--font-mono"
       preload={[{ subset: "latin", weight: 400, style: "normal" }]}
     />
 
@@ -131,6 +135,15 @@ const structuredData = {
         <meta
           name="google-site-verification"
           content={PUBLIC_GOOGLE_SITE_VERIFICATION}
+        />
+      )
+    }
+    {
+      // Hardcoded GSC verification for ktt.dev
+      !PUBLIC_GOOGLE_SITE_VERIFICATION && (
+        <meta
+          name="google-site-verification"
+          content="nmzBgc7mqdUiK7_yIbpqE8LkkaHVydVs6l6LdeN0SSI"
         />
       )
     }

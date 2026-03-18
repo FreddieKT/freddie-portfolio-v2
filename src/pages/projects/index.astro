@@ -1,0 +1,137 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+
+const projects = await getCollection("projects", ({ data }) => !data.draft);
+
+const sorted = projects.sort(
+  (a, b) =>
+    new Date(b.data.pubDatetime).getTime() -
+    new Date(a.data.pubDatetime).getTime()
+);
+
+const featured = sorted.filter(p => p.data.featured);
+const rest = sorted.filter(p => !p.data.featured);
+---
+
+<Layout
+  title={`Projects | ${SITE.title}`}
+  description="A selection of things I have built, experimented with, or kept improving over time."
+>
+  <Header />
+  <Main
+    pageTitle="Projects"
+    pageDesc="Things I've built, experimented with, or kept improving over time."
+  >
+    {
+      featured.length > 0 && (
+        <section class="mb-10">
+          <h2 class="mb-4 text-lg font-semibold">Featured</h2>
+          <ul class="divide-y divide-border">
+            {featured.map(project => (
+              <li class="py-6 first:pt-0">
+                <a
+                  href={`/projects/${project.id}`}
+                  class="text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
+                >
+                  {project.data.title}
+                </a>
+                <div class="text-muted-foreground mt-1 flex flex-wrap gap-2 text-sm">
+                  <span class="rounded-full border border-border px-2 py-0.5 text-xs">
+                    {project.data.category}
+                  </span>
+                  {project.data.technologies.slice(0, 3).map(tech => (
+                    <span class="rounded-full border border-border px-2 py-0.5 text-xs">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                <p class="mt-2 text-sm">{project.data.description}</p>
+                <div class="mt-2 flex gap-4 text-sm">
+                  {project.data.link && (
+                    <a
+                      href={project.data.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-accent decoration-dashed underline-offset-4 hover:underline"
+                    >
+                      Live ↗
+                    </a>
+                  )}
+                  {project.data.github && (
+                    <a
+                      href={project.data.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-accent decoration-dashed underline-offset-4 hover:underline"
+                    >
+                      Code ↗
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      rest.length > 0 && (
+        <section>
+          <h2 class="mb-4 text-lg font-semibold">Other work</h2>
+          <ul class="divide-y divide-border">
+            {rest.map(project => (
+              <li class="py-6 first:pt-0">
+                <a
+                  href={`/projects/${project.id}`}
+                  class="text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
+                >
+                  {project.data.title}
+                </a>
+                <div class="mt-1 flex flex-wrap gap-2">
+                  <span class="rounded-full border border-border px-2 py-0.5 text-xs">
+                    {project.data.category}
+                  </span>
+                  {project.data.technologies.slice(0, 3).map(tech => (
+                    <span class="rounded-full border border-border px-2 py-0.5 text-xs">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                <p class="mt-2 text-sm">{project.data.description}</p>
+                <div class="mt-2 flex gap-4 text-sm">
+                  {project.data.link && (
+                    <a
+                      href={project.data.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-accent decoration-dashed underline-offset-4 hover:underline"
+                    >
+                      Live ↗
+                    </a>
+                  )}
+                  {project.data.github && (
+                    <a
+                      href={project.data.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-accent decoration-dashed underline-offset-4 hover:underline"
+                    >
+                      Code ↗
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </Main>
+  <Footer />
+</Layout>

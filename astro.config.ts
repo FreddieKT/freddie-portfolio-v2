@@ -11,9 +11,13 @@ import {
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 
+// Use PUBLIC_SITE_URL env var to override the site URL (useful for Vercel
+// preview deployments before a custom domain is connected).
+const siteUrl = process.env.PUBLIC_SITE_URL ?? SITE.website;
+
 // https://astro.build/config
 export default defineConfig({
-  site: SITE.website,
+  site: siteUrl,
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
@@ -51,6 +55,11 @@ export default defineConfig({
   env: {
     schema: {
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
+      PUBLIC_WEB3FORMS_KEY: envField.string({
         access: "public",
         context: "client",
         optional: true,

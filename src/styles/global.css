@@ -23,19 +23,31 @@ html[data-theme="light"] {
 
 /* ===== Dark theme ===== */
 html[data-theme="dark"] {
-  --background: #040404;
-  --foreground: #ebe5db;
-  --accent: #cfa55b;
-  --muted: #0b0b0b;
-  --border: #1b1814;
+  /* Core - Balanced dark palette */
+  --background: #0a0a0b;
+  --foreground: #e4e4e7;
+  --accent: #3b82f6;
+  --muted: #18181b;
+  --border: #27272a;
 
-  /* Extended palette */
-  --card: rgba(10, 10, 10, 0.94);
-  --panel: rgba(8, 8, 8, 0.9);
-  --border-strong: rgba(209, 168, 92, 0.18);
-  --accent-dim: #8c6c3b;
-  --heading: #faf5ec;
-  --text-muted: #9d907b;
+  /* Extended palette - Zinc scale */
+  --card: #18181b;
+  --panel: #121215;
+  --border-strong: #3f3f46;
+  --accent-dim: #1d4ed8;
+  --heading: #fafafa;
+  --text-muted: #a1a1aa;
+  
+  /* Semantic colors */
+  --primary: #3b82f6;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.6);
 }
 
 @theme inline {

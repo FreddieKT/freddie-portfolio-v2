@@ -23,31 +23,31 @@ html[data-theme="light"] {
 
 /* ===== Dark theme ===== */
 html[data-theme="dark"] {
-  /* Core - Balanced dark palette */
-  --background: #0a0a0b;
-  --foreground: #e4e4e7;
-  --accent: #3b82f6;
-  --muted: #18181b;
-  --border: #27272a;
+  /* Core - Warm dark palette (mirrors light mode's earthy tones) */
+  --background: #131210;
+  --foreground: #e6e2dc;
+  --accent: #4a9fd4;
+  --muted: #1c1a17;
+  --border: #2a2720;
 
-  /* Extended palette - Zinc scale */
-  --card: #18181b;
-  --panel: #121215;
-  --border-strong: #3f3f46;
-  --accent-dim: #1d4ed8;
-  --heading: #fafafa;
-  --text-muted: #a1a1aa;
+  /* Extended palette - Warm stone scale */
+  --card: #1c1a17;
+  --panel: #171512;
+  --border-strong: #3a3529;
+  --accent-dim: #2c6a9f;
+  --heading: #f0ece5;
+  --text-muted: #968d80;
 
   /* Semantic colors */
-  --primary: #3b82f6;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
+  --primary: #4a9fd4;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --error: #f87171;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {

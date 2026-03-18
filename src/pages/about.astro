@@ -7,6 +7,7 @@ import { SITE } from "@/config";
 import { PROFILE } from "@/data/profile";
 import { EXPERIENCE } from "@/data/experience";
 import { CERTIFICATES } from "@/data/certificates";
+import ContactForm from "@/components/ContactForm.astro";
 
 const TOOLS: { name: string; category: string }[] = [
   { name: "Astro", category: "Frontend" },
@@ -237,37 +238,30 @@ const VALUES = [
       </p>
       <h2 class="mt-2 text-2xl font-semibold">Stay connected</h2>
 
-      <div
-        class="mt-6 rounded-lg border border-border bg-[var(--panel)] p-6 text-sm"
-      >
-        <p class="text-[var(--text-muted)]">
+      <div class="mt-6 rounded-lg border border-border bg-[var(--panel)] p-6">
+        <p class="text-sm text-[var(--text-muted)]">
           If you'd like to connect or have questions about my work, feel free to
           reach out.
         </p>
-        <a
-          href={`mailto:${PROFILE.email}`}
-          class="mt-4 inline-block rounded-full bg-accent px-5 py-2 text-sm font-medium text-background hover:opacity-90"
-        >
-          Send an email →
-        </a>
-        <div class="mt-5 flex flex-wrap gap-4 text-[var(--text-muted)]">
+        <ContactForm />
+        <div class="mt-4 flex flex-wrap gap-4 text-sm text-[var(--text-muted)]">
           <a
             href={PROFILE.github}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm hover:text-accent">GitHub ↗</a
+            class="hover:text-accent">GitHub ↗</a
           >
           <a
             href={PROFILE.twitter}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm hover:text-accent">X ↗</a
+            class="hover:text-accent">X ↗</a
           >
           <a
             href={PROFILE.kaggle}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm hover:text-accent">Kaggle ↗</a
+            class="hover:text-accent">Kaggle ↗</a
           >
         </div>
       </div>

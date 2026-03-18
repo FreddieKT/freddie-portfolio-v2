@@ -31,24 +31,7 @@ const toolsByCategory = TOOLS.reduce<Record<string, string[]>>((acc, tool) => {
   return acc;
 }, {});
 
-const VALUES = [
-  {
-    title: "Ship early, improve often",
-    body: "A working thing beats a perfect plan. I prefer to release early and refine based on real feedback.",
-  },
-  {
-    title: "Small and focused",
-    body: "I avoid scope creep by building the smallest useful version first. Complexity can come later — or not at all.",
-  },
-  {
-    title: "Learn by building",
-    body: "Reading is fine. Building is better. Most of what I know came from making things that didn't work the first time.",
-  },
-  {
-    title: "Honest documentation",
-    body: "I write about failures and half-finished ideas as much as wins. The rough parts are usually more useful anyway.",
-  },
-];
+
 ---
 
 <Layout
@@ -210,28 +193,6 @@ const VALUES = [
       </ul>
     </section>
 
-    <!-- ── Philosophy ── -->
-    <section id="values" class="border-b border-border py-12">
-      <p
-        class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase"
-      >
-        Philosophy
-      </p>
-      <h2 class="mt-2 text-2xl font-semibold">How I work</h2>
-
-      <div class="mt-6 grid gap-4 sm:grid-cols-2">
-        {
-          VALUES.map(v => (
-            <div class="rounded-lg border border-border bg-[var(--panel)] p-5 transition-colors hover:border-accent">
-              <p class="font-semibold">{v.title}</p>
-              <p class="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-                {v.body}
-              </p>
-            </div>
-          ))
-        }
-      </div>
-    </section>
 
     <!-- ── Contact ── -->
     <section id="contact" class="py-12">

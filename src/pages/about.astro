@@ -8,6 +8,7 @@ import { PROFILE } from "@/data/profile";
 import { EXPERIENCE } from "@/data/experience";
 import { CERTIFICATES } from "@/data/certificates";
 import ContactForm from "@/components/ContactForm.astro";
+import GitHubStats from "@/components/GitHubStats.astro";
 
 const TOOLS: { name: string; category: string }[] = [
   { name: "Astro", category: "Frontend" },
@@ -97,6 +98,11 @@ const VALUES = [
           </p>
         </div>
       </div>
+    </section>
+
+    <!-- GitHub Stats -->
+    <section class="py-12">
+      <GitHubStats username="FreddieKT" />
     </section>
 
     <!-- ── Stack ── -->

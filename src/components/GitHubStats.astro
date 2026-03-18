@@ -1,0 +1,39 @@
+---
+// GitHub Stats Component for Astro
+interface Props {
+  username?: string;
+}
+
+const { username = "FreddieKT" } = Astro.props;
+
+// Fetch GitHub stats
+const response = await fetch(`https://github-readme-stats.vercel.app/api?username=${username}&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=58a6ff&text_color=e6edf3&ring_color=58a6ff`);
+const streakResponse = await fetch(`https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=58a6ff&text_color=e6edf3&card_size=small&langs_count=6`);
+---
+
+<div class="github-stats-wrapper">
+  <img 
+    src={`https://github-readme-stats.vercel.app/api?username=${username}&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=58a6ff&text_color=e6edf3&ring_color=58a6ff&show_icons=true&count_private=true`}
+    alt="GitHub Stats"
+    class="github-stat-card"
+  />
+</div>
+
+<style>
+  .github-stats-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+  
+  .github-stat-card {
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+  }
+  
+  .github-stat-card:hover {
+    transform: translateY(-4px);
+  }
+</style>

@@ -54,8 +54,7 @@ html[data-theme="dark"] {
   }
   body {
     @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
-    font-family:
-      var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
+    font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
     line-height: 1.65;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;

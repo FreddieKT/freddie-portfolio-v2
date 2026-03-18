@@ -1,0 +1,90 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import BackButton from "@/components/BackButton.astro";
+import { SITE } from "@/config";
+
+type Props = {
+  project: CollectionEntry<"projects">;
+};
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects", ({ data }) => !data.draft);
+  return projects.map(project => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { title, description, category, technologies, link, github, ogImage } =
+  project.data;
+const ogImageStr =
+  typeof ogImage === "string" ? ogImage : (ogImage?.src ?? undefined);
+const { Content } = await render(project);
+---
+
+<Layout
+  title={`${title} | ${SITE.title}`}
+  description={description}
+  ogImage={ogImageStr}
+>
+  <Header />
+  <main id="main-content" class="app-layout pb-12">
+    <BackButton />
+
+    <article>
+      <header class="mb-8 border-b border-border pb-6">
+        <div class="mb-3 flex flex-wrap gap-2">
+          <span class="rounded-full border border-border px-2 py-0.5 text-xs">
+            {category}
+          </span>
+          {
+            technologies.map(tech => (
+              <span class="rounded-full border border-border px-2 py-0.5 text-xs">
+                {tech}
+              </span>
+            ))
+          }
+        </div>
+
+        <h1 class="text-3xl font-bold sm:text-4xl">{title}</h1>
+        <p class="text-muted-foreground mt-3 text-lg">{description}</p>
+
+        {
+          (link || github) && (
+            <div class="mt-4 flex gap-4 text-sm">
+              {link && (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full border border-accent bg-accent px-4 py-1.5 text-sm font-medium text-white hover:opacity-90"
+                >
+                  View Live ↗
+                </a>
+              )}
+              {github && (
+                <a
+                  href={github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full border border-border px-4 py-1.5 text-sm font-medium hover:border-accent hover:text-accent"
+                >
+                  View Code ↗
+                </a>
+              )}
+            </div>
+          )
+        }
+      </header>
+
+      <div class="prose max-w-none">
+        <Content />
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Layout>

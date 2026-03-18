@@ -59,7 +59,9 @@ html[data-theme="dark"] {
   }
   body {
     @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
-    font-family: var(--font-sans), 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
+    font-family:
+      var(--font-sans), "Atkinson Hyperlegible", ui-sans-serif, system-ui,
+      sans-serif;
     line-height: 1.65;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -76,7 +78,7 @@ html[data-theme="dark"] {
   kbd,
   pre,
   samp {
-    font-family: var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace;
+    font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
   }
 }
 

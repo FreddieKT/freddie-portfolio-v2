@@ -1,4 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="10" fill="#0b6aa8"/>
-  <text x="32" y="44" font-family="ui-monospace,monospace" font-size="26" font-weight="700" fill="white" text-anchor="middle">KT</text>
+<svg width="256" height="256" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g shape-rendering="crispEdges">
+
+    <!-- HAIR -->
+    <rect x="16" y="6" width="32" height="8" fill="#0B0C10"/>
+    <rect x="14" y="8" width="4" height="8" fill="#0B0C10"/>
+    <rect x="46" y="8" width="4" height="8" fill="#0B0C10"/>
+    <rect x="18" y="4" width="10" height="2" fill="#14161C"/>
+    <rect x="30" y="4" width="10" height="2" fill="#14161C"/>
+
+    <!-- FRINGE -->
+    <rect x="18" y="14" width="2" height="4" fill="#0B0C10"/>
+    <rect x="22" y="14" width="2" height="5" fill="#0B0C10"/>
+    <rect x="26" y="14" width="2" height="4" fill="#0B0C10"/>
+    <rect x="30" y="14" width="2" height="5" fill="#0B0C10"/>
+    <rect x="34" y="14" width="2" height="4" fill="#0B0C10"/>
+    <rect x="38" y="14" width="2" height="5" fill="#0B0C10"/>
+    <rect x="42" y="14" width="2" height="4" fill="#0B0C10"/>
+
+    <!-- FACE -->
+    <rect x="18" y="16" width="28" height="24" fill="#E8AF8A"/>
+    <rect x="18" y="16" width="2" height="24" fill="#D79A77"/>
+    <rect x="44" y="16" width="2" height="24" fill="#D79A77"/>
+
+    <!-- EARS -->
+    <rect x="14" y="22" width="4" height="10" fill="#D99673"/>
+    <rect x="46" y="22" width="4" height="10" fill="#D99673"/>
+
+    <!-- EYEBROWS -->
+    <rect x="22" y="24" width="8" height="2" fill="#2E1F1A"/>
+    <rect x="34" y="24" width="8" height="2" fill="#2E1F1A"/>
+
+    <!-- EYES -->
+    <rect x="22" y="28" width="6" height="4" fill="#FFFFFF"/>
+    <rect x="34" y="28" width="6" height="4" fill="#FFFFFF"/>
+    <rect x="24" y="28" width="3" height="4" fill="#1A1A1A"/>
+    <rect x="36" y="28" width="3" height="4" fill="#1A1A1A"/>
+    <rect x="25" y="29" width="1" height="1" fill="#FFFFFF"/>
+    <rect x="37" y="29" width="1" height="1" fill="#FFFFFF"/>
+
+    <!-- NOSE -->
+    <rect x="29" y="32" width="4" height="2" fill="#D1906D"/>
+    <rect x="28" y="34" width="6" height="1" fill="#B87555"/>
+
+    <!-- MUSTACHE -->
+    <rect x="25" y="36" width="4" height="1" fill="#7B5544" opacity="0.7"/>
+    <rect x="33" y="36" width="4" height="1" fill="#7B5544" opacity="0.7"/>
+
+    <!-- MOUTH -->
+    <rect x="27" y="38" width="10" height="2" fill="#8C5C46"/>
+
+    <!-- CHIN STUBBLE -->
+    <rect x="28" y="41" width="8" height="1" fill="#7B5544" opacity="0.4"/>
+
+    <!-- NECK -->
+    <rect x="28" y="40" width="8" height="4" fill="#B97A56"/>
+
+    <!-- SHIRT -->
+    <rect x="26" y="44" width="12" height="10" fill="#F0EEEA"/>
+
+    <!-- HOODIE -->
+    <rect x="16" y="44" width="32" height="20" fill="#0C0E12"/>
+    <rect x="12" y="50" width="40" height="16" fill="#090A0D"/>
+
+    <!-- HOOD -->
+    <rect x="16" y="42" width="8" height="6" fill="#141821"/>
+    <rect x="40" y="42" width="8" height="6" fill="#141821"/>
+    <rect x="24" y="42" width="16" height="4" fill="#181C24"/>
+
+    <!-- ZIPPER -->
+    <rect x="31" y="46" width="1" height="18" fill="#2A2E36"/>
+
+    <!-- DRAWSTRINGS -->
+    <rect x="26" y="46" width="1" height="10" fill="#AEB4BD"/>
+    <rect x="37" y="46" width="1" height="10" fill="#AEB4BD"/>
+
+  </g>
 </svg>

@@ -6,7 +6,6 @@ tags: ["automation", "test"]
 draft: false
 ---
 
-
 # My First Automated Post
 
 This is my first blog post published through the automated workflow!
@@ -14,4 +13,3 @@ This is my first blog post published through the automated workflow!
 ## Introduction
 
 Content goes here...
-

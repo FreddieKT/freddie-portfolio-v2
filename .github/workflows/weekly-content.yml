@@ -3,10 +3,8 @@ name: Weekly Content Creator
 run-name: Weekly Content Creator
 on:
   schedule:
-    # Every Sunday at 9am
     - cron: "0 9 * * 0"
   workflow_dispatch:
-    # Manual trigger
 
 jobs:
   create-content:
@@ -14,7 +12,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -33,31 +31,11 @@ jobs:
           OPENCLAW_TOKEN: ${{ secrets.OPENCLAW_TOKEN }}
         id: generate
         run: |
-          # Generate collision-resistant slug with timestamp
           SLUG="weekly-post-$(date +%Y%m%d%H%M%S)"
           DATETIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          
-          # Call OpenClaw API to spawn content agent
-          RESPONSE=$(curl -s -X POST "$OPENCLAW_URL/api/v1/sessions" \
-            -H "Authorization: Bearer $OPENCLAW_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "agentId": "claude",
-              "runtime": "acp",
-              "task": "Write a blog post for a developer portfolio. 
-              
-              Topic: Write about AI tools for developers, web development tips, or coding productivity.
-              
-              Requirements:
-              - 400-600 words
-              - Friendly, practical tone
-              - English
-              - Include at least 2 sections with headings
-              
-              Output: Just write the full markdown content. Start directly with ---frontmatter and end with the content. Do not include explanations."
-            }')
-          
-          echo "Generated content response received"
+
+          echo "Generated SLUG: $SLUG"
+          echo "DATETIME: $DATETIME"
           echo "SLUG=${SLUG}" >> $GITHUB_OUTPUT
           echo "DATETIME=${DATETIME}" >> $GITHUB_OUTPUT
 
@@ -65,57 +43,52 @@ jobs:
         run: |
           SLUG="${{ steps.generate.outputs.SLUG }}"
           DATETIME="${{ steps.generate.outputs.DATETIME }}"
-          
-          # Default content (fallback if API call needs setup)
-          CONTENT="---
-title: \"How AI is Changing Developer Productivity\"
-pubDatetime: ${DATETIME}
-description: \"Exploring how AI tools are transforming the way developers work.\"
-tags: [\"AI\", \"productivity\"]
-draft: false
----
 
-The landscape of software development is evolving rapidly. AI tools have become essential in our daily workflow.
+          cat > src/data/blog/${SLUG}.md << 'MARKDOWN'
+          ---
+          title: "How AI is Changing Developer Productivity"
+          pubDatetime: PUBLISHDATETIME
+          description: "Exploring how AI tools are transforming the way developers work."
+          tags: ["AI", "productivity"]
+          draft: false
+          ---
 
-## The New Developer Toolkit
+          The landscape of software development is evolving rapidly. AI tools have become essential in our daily workflow.
 
-AI-powered tools help with code completion, debugging, and problem-solving.
+          ## The New Developer Toolkit
 
-## Key Benefits
+          AI-powered tools help with code completion, debugging, and problem-solving.
 
-1. **Faster Prototyping** - Get ideas to code faster
-2. **Better Code Reviews** - AI catches issues early
-3. **Learning Acceleration** - Complex concepts explained instantly
+          ## Key Benefits
 
-Stay curious, keep building, and let AI be your copilot."
-          
-          # Write content to file
-          echo "$CONTENT" > src/data/blog/${SLUG}.md
-          
+          1. **Faster Prototyping** - Get ideas to code faster
+          2. **Better Code Reviews** - AI catches issues early
+          3. **Learning Acceleration** - Complex concepts explained instantly
+
+          Stay curious, keep building, and let AI be your copilot.
+          MARKDOWN
+
+          sed -i "s|PUBLISHDATETIME|${DATETIME}|g" src/data/blog/${SLUG}.md
+
           echo "Created: src/data/blog/${SLUG}.md"
 
       - name: Commit and create PR
         run: |
-          # Check if there are staged changes
           if ! git diff --quiet --staged; then
             echo "Changes detected, creating PR..."
             
-            # Configure git
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"
             
-            # Create branch
             BRANCH="chore/weekly-content-$(date +%Y%m%d%H%M%S)"
             git checkout -b "$BRANCH"
             
-            # Stage and commit
             git add src/data/blog/
-            git commit -m "feat: add weekly blog post" || echo "No changes to commit"
+            git commit -m "feat: add weekly blog post" || echo "No changes"
             
-            # Push and create PR
             git push -u origin "$BRANCH" || echo "Push failed"
             
-            gh pr create --title "feat: add weekly blog post" --body "Auto-generated weekly content" || echo "PR creation skipped"
+            gh pr create --title "feat: add weekly blog post" --body "Auto-generated weekly content" || echo "PR skipped"
           else
             echo "No content changes to commit. Skipping PR."
           fi

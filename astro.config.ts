@@ -64,6 +64,11 @@ export default defineConfig({
         context: "client",
         optional: true,
       }),
+      GITHUB_TOKEN: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
     },
   },
   experimental: {

@@ -1,0 +1,209 @@
+---
+const GITHUB_USERNAME = "FreddieKT";
+const token = import.meta.env.GITHUB_TOKEN;
+
+type ContributionDay = {
+  contributionCount: number;
+  date: string;
+  weekday: number;
+};
+
+type Week = {
+  contributionDays: ContributionDay[];
+};
+
+type Calendar = {
+  totalContributions: number;
+  weeks: Week[];
+};
+
+let calendar: Calendar | null = null;
+
+if (token) {
+  try {
+    const res = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        Authorization: `bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `{
+          user(login: "${GITHUB_USERNAME}") {
+            contributionsCollection {
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                    weekday
+                  }
+                }
+              }
+            }
+          }
+        }`,
+      }),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      calendar =
+        json.data?.user?.contributionsCollection?.contributionCalendar ?? null;
+    }
+  } catch {
+    // fail gracefully — section is hidden if fetch fails
+  }
+}
+
+function getLevel(count: number): 0 | 1 | 2 | 3 | 4 {
+  if (count === 0) return 0;
+  if (count <= 3) return 1;
+  if (count <= 6) return 2;
+  if (count <= 9) return 3;
+  return 4;
+}
+
+// Build month label positions from the weeks array
+function getMonthLabels(weeks: Week[]) {
+  const labels: { label: string; col: number }[] = [];
+  let lastMonth = -1;
+  weeks.forEach((week, i) => {
+    const first = week.contributionDays[0];
+    if (!first) return;
+    const month = new Date(first.date + "T00:00:00").getMonth();
+    if (month !== lastMonth) {
+      labels.push({
+        label: new Date(first.date + "T00:00:00").toLocaleString("en-US", {
+          month: "short",
+        }),
+        col: i,
+      });
+      lastMonth = month;
+    }
+  });
+  return labels;
+}
+
+const weeks = calendar?.weeks ?? [];
+const monthLabels = getMonthLabels(weeks);
+// Sparse day-of-week labels: index 0 = Sun, show Mon/Wed/Fri (1, 3, 5)
+const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const CELL = 11; // px
+const GAP = 2; // px
+const CELL_STRIDE = CELL + GAP; // 13px per cell
+---
+
+{
+  calendar && (
+    <section id="github" class="border-b border-border py-12">
+      <p class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase">
+        Open Source
+      </p>
+      <h2 class="mt-2 text-2xl font-semibold sm:text-3xl">GitHub Activity</h2>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">
+        {calendar.totalContributions.toLocaleString()} contributions in the last
+        year
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <div style={`min-width: ${weeks.length * CELL_STRIDE + 32}px`}>
+          {/* Month labels */}
+          <div class="relative mb-1 h-4" style="padding-left: 32px;">
+            {monthLabels.map(({ label, col }) => (
+              <span
+                class="absolute text-[10px] text-[var(--text-muted)]"
+                style={`left: ${32 + col * CELL_STRIDE}px`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          {/* Calendar grid */}
+          <div class="flex">
+            {/* Day-of-week labels */}
+            <div
+              class="me-1 flex shrink-0 flex-col"
+              style={`gap: ${GAP}px; width: 28px;`}
+            >
+              {DAY_LABELS.map(label => (
+                <div
+                  class="flex items-center justify-end text-[10px] text-[var(--text-muted)]"
+                  style={`height: ${CELL}px;`}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* Contribution cells */}
+            <div class="flex" style={`gap: ${GAP}px`}>
+              {weeks.map(week => (
+                <div class="flex flex-col" style={`gap: ${GAP}px`}>
+                  {Array.from({ length: 7 }, (_, dayIndex) => {
+                    const day = week.contributionDays.find(
+                      d => d.weekday === dayIndex
+                    );
+                    const level = day ? getLevel(day.contributionCount) : 0;
+                    return (
+                      <div
+                        class={`cell level-${level}`}
+                        style={`width:${CELL}px;height:${CELL}px`}
+                        title={
+                          day
+                            ? `${day.date}: ${day.contributionCount} contribution${day.contributionCount !== 1 ? "s" : ""}`
+                            : "No data"
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .cell {
+    border-radius: 2px;
+  }
+
+  /* Light mode */
+  .level-0 {
+    background-color: #ebedf0;
+  }
+  .level-1 {
+    background-color: #9be9a8;
+  }
+  .level-2 {
+    background-color: #40c463;
+  }
+  .level-3 {
+    background-color: #30a14e;
+  }
+  .level-4 {
+    background-color: #216e39;
+  }
+
+  /* Dark mode */
+  :global([data-theme="dark"]) .level-0 {
+    background-color: #161b22;
+  }
+  :global([data-theme="dark"]) .level-1 {
+    background-color: #0e4429;
+  }
+  :global([data-theme="dark"]) .level-2 {
+    background-color: #006d32;
+  }
+  :global([data-theme="dark"]) .level-3 {
+    background-color: #26a641;
+  }
+  :global([data-theme="dark"]) .level-4 {
+    background-color: #39d353;
+  }
+</style>

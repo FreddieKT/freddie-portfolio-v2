@@ -23,23 +23,23 @@ html[data-theme="light"] {
 
 /* ===== Dark theme ===== */
 html[data-theme="dark"] {
-  /* Core - Warm dark palette (mirrors light mode's earthy tones) */
-  --background: #131210;
-  --foreground: #e6e2dc;
-  --accent: #4a9fd4;
-  --muted: #1c1a17;
-  --border: #2a2720;
+  /* Core - AstroPaper org palette */
+  --background: #212737;
+  --foreground: #eaedf3;
+  --accent: #ff6b01;
+  --muted: #343f60;
+  --border: #ab4b08;
 
-  /* Extended palette - Warm stone scale */
-  --card: #1c1a17;
-  --panel: #171512;
-  --border-strong: #3a3529;
-  --accent-dim: #2c6a9f;
-  --heading: #f0ece5;
-  --text-muted: #968d80;
+  /* Extended palette */
+  --card: #2a3350;
+  --panel: #252c42;
+  --border-strong: #c45810;
+  --accent-dim: #cc5501;
+  --heading: #f0f3fa;
+  --text-muted: #8b95b8;
 
   /* Semantic colors */
-  --primary: #4a9fd4;
+  --primary: #ff6b01;
   --success: #4ade80;
   --warning: #fbbf24;
   --error: #f87171;

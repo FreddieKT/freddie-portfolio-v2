@@ -58,6 +58,7 @@ html[data-theme="dark"] {
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-muted-foreground: var(--text-muted);
 }
 
 @layer base {

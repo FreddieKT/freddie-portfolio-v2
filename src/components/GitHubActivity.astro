@@ -1,131 +1,103 @@
 ---
 const GITHUB_USERNAME = "FreddieKT";
-const token = import.meta.env.GITHUB_TOKEN;
 
-type ContributionDay = {
-  contributionCount: number;
+type Contribution = {
   date: string;
-  weekday: number;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
 };
 
-type Week = {
-  contributionDays: ContributionDay[];
+type ApiResponse = {
+  total: { lastYear: number };
+  contributions: Contribution[];
 };
 
-type Calendar = {
-  totalContributions: number;
-  weeks: Week[];
-};
+let total = 0;
+let weeks: Contribution[][] = [];
 
-let calendar: Calendar | null = null;
+try {
+  const res = await fetch(
+    `https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=last`
+  );
+  if (res.ok) {
+    const data: ApiResponse = await res.json();
+    total = data.total.lastYear ?? 0;
 
-if (token) {
-  try {
-    const res = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: `bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `{
-          user(login: "${GITHUB_USERNAME}") {
-            contributionsCollection {
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                    weekday
-                  }
-                }
-              }
-            }
-          }
-        }`,
-      }),
+    // Group flat contributions into Sun–Sat weeks
+    const sorted = [...data.contributions].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    let week: Contribution[] = [];
+    sorted.forEach(day => {
+      const dow = new Date(day.date + "T00:00:00").getDay(); // 0=Sun
+      if (dow === 0 && week.length) {
+        weeks.push(week);
+        week = [];
+      }
+      week.push(day);
     });
-    if (res.ok) {
-      const json = await res.json();
-      calendar =
-        json.data?.user?.contributionsCollection?.contributionCalendar ?? null;
-    }
-  } catch {
-    // fail gracefully — section is hidden if fetch fails
+    if (week.length) weeks.push(week);
   }
+} catch {
+  // fail gracefully — section hidden if fetch fails
 }
 
-function getLevel(count: number): 0 | 1 | 2 | 3 | 4 {
-  if (count === 0) return 0;
-  if (count <= 3) return 1;
-  if (count <= 6) return 2;
-  if (count <= 9) return 3;
-  return 4;
-}
+// Month labels: track when the month changes across weeks
+const monthLabels: { label: string; col: number }[] = [];
+let lastMonth = -1;
+weeks.forEach((week, i) => {
+  const first = week[0];
+  if (!first) return;
+  const month = new Date(first.date + "T00:00:00").getMonth();
+  if (month !== lastMonth) {
+    monthLabels.push({
+      label: new Date(first.date + "T00:00:00").toLocaleString("en-US", {
+        month: "short",
+      }),
+      col: i,
+    });
+    lastMonth = month;
+  }
+});
 
-// Build month label positions from the weeks array
-function getMonthLabels(weeks: Week[]) {
-  const labels: { label: string; col: number }[] = [];
-  let lastMonth = -1;
-  weeks.forEach((week, i) => {
-    const first = week.contributionDays[0];
-    if (!first) return;
-    const month = new Date(first.date + "T00:00:00").getMonth();
-    if (month !== lastMonth) {
-      labels.push({
-        label: new Date(first.date + "T00:00:00").toLocaleString("en-US", {
-          month: "short",
-        }),
-        col: i,
-      });
-      lastMonth = month;
-    }
-  });
-  return labels;
-}
-
-const weeks = calendar?.weeks ?? [];
-const monthLabels = getMonthLabels(weeks);
-// Sparse day-of-week labels: index 0 = Sun, show Mon/Wed/Fri (1, 3, 5)
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
-const CELL = 11; // px
-const GAP = 2; // px
-const CELL_STRIDE = CELL + GAP; // 13px per cell
+const CELL = 11;
+const GAP = 2;
+const STRIDE = CELL + GAP;
 ---
 
 {
-  calendar && (
+  weeks.length > 0 && (
     <section id="github" class="border-b border-border py-12">
       <p class="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase">
         Open Source
       </p>
       <h2 class="mt-2 text-2xl font-semibold sm:text-3xl">GitHub Activity</h2>
       <p class="mt-1 text-sm text-[var(--text-muted)]">
-        {calendar.totalContributions.toLocaleString()} contributions in the last
-        year
+        {total.toLocaleString()} contributions in the last year
       </p>
 
       <div class="mt-6 overflow-x-auto">
-        <div style={`min-width: ${weeks.length * CELL_STRIDE + 32}px`}>
+        <div style={`min-width: ${weeks.length * STRIDE + 36}px`}>
           {/* Month labels */}
-          <div class="relative mb-1 h-4" style="padding-left: 32px;">
+          <div class="relative mb-1 h-4" style="padding-left: 36px;">
             {monthLabels.map(({ label, col }) => (
               <span
                 class="absolute text-[10px] text-[var(--text-muted)]"
-                style={`left: ${32 + col * CELL_STRIDE}px`}
+                style={`left: ${36 + col * STRIDE}px`}
               >
                 {label}
               </span>
             ))}
           </div>
 
-          {/* Calendar grid */}
+          {/* Grid */}
           <div class="flex">
-            {/* Day-of-week labels */}
+            {/* Day labels */}
             <div
               class="me-1 flex shrink-0 flex-col"
-              style={`gap: ${GAP}px; width: 28px;`}
+              style={`gap: ${GAP}px; width: 32px;`}
             >
               {DAY_LABELS.map(label => (
                 <div
@@ -137,29 +109,31 @@ const CELL_STRIDE = CELL + GAP; // 13px per cell
               ))}
             </div>
 
-            {/* Contribution cells */}
+            {/* Weeks */}
             <div class="flex" style={`gap: ${GAP}px`}>
-              {weeks.map(week => (
-                <div class="flex flex-col" style={`gap: ${GAP}px`}>
-                  {Array.from({ length: 7 }, (_, dayIndex) => {
-                    const day = week.contributionDays.find(
-                      d => d.weekday === dayIndex
-                    );
-                    const level = day ? getLevel(day.contributionCount) : 0;
-                    return (
+              {weeks.map(week => {
+                // Pad week to always 7 rows (Sun=0 … Sat=6)
+                const cells: (Contribution | null)[] = Array(7).fill(null);
+                week.forEach(day => {
+                  const dow = new Date(day.date + "T00:00:00").getDay();
+                  cells[dow] = day;
+                });
+                return (
+                  <div class="flex flex-col" style={`gap: ${GAP}px`}>
+                    {cells.map(day => (
                       <div
-                        class={`cell level-${level}`}
+                        class={`cell level-${day?.level ?? 0}`}
                         style={`width:${CELL}px;height:${CELL}px`}
                         title={
                           day
-                            ? `${day.date}: ${day.contributionCount} contribution${day.contributionCount !== 1 ? "s" : ""}`
+                            ? `${day.date}: ${day.count} contribution${day.count !== 1 ? "s" : ""}`
                             : "No data"
                         }
                       />
-                    );
-                  })}
-                </div>
-              ))}
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

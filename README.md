@@ -64,11 +64,11 @@ Push to `main` — Vercel deploys automatically.
 
 ## Environment variables
 
-| Variable | Description |
-|---|---|
-| `PUBLIC_SITE_URL` | Full site URL (e.g. `https://ktt.dev`) |
-| `PUBLIC_WEB3FORMS_KEY` | Contact form key from [web3forms.com](https://web3forms.com) |
-| `PUBLIC_GOOGLE_SITE_VERIFICATION` | Google Search Console (optional) |
+| Variable                          | Description                                                  |
+| --------------------------------- | ------------------------------------------------------------ |
+| `PUBLIC_SITE_URL`                 | Full site URL (e.g. `https://ktt.dev`)                       |
+| `PUBLIC_WEB3FORMS_KEY`            | Contact form key from [web3forms.com](https://web3forms.com) |
+| `PUBLIC_GOOGLE_SITE_VERIFICATION` | Google Search Console (optional)                             |
 
 ## Local dev
 

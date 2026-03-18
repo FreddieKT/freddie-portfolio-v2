@@ -1,6 +1,5 @@
 ---
 name: Weekly Content Creator
-description: AI-powered weekly blog post generator
 run-name: Weekly Content Creator
 on:
   schedule:
@@ -21,100 +20,96 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           
-      - name: Generate content prompt
-        id: prompt
-        run: |
-          PROMPT=$(cat << 'EOF'
-          You are a content creator. Write a compelling blog post for a developer portfolio.
-          
-          Topics to choose from (pick one):
-          - AI tools and productivity
-          - Web development tips
-          - Learning to code
-          - Side project journey
-          - Tech career advice
-          
-          Requirements:
-          - Title: Catchy, developer-focused
-          - Description: 1-2 sentences
-          - Tags: 2-3 relevant tags
-          - Content: 400-600 words, friendly tone, practical tips
-          - Language: English
-          
-          Output format (markdown):
-          ---
-          title: "Your Title"
-          pubDatetime: ${{ vars.PUBLISH_DATETIME }}
-          description: "Your description"
-          tags: ["tag1", "tag2"]
-          draft: false
-          ---
-          
-          Your content here...
-          EOF
-          echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
-          
-      - name: Call AI to generate content
+      - name: Create content via ACP Agent
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENCLAW_URL: ${{ vars.OPENCLAW_URL }}
+          OPENCLAW_TOKEN: ${{ secrets.OPENCLAW_TOKEN }}
         run: |
-          # This would call your AI (Claude/GPT) with the prompt
-          # For now, create a sample post structure
-          echo "Blog post would be generated here"
-          
-      - name: Create blog post
-        run: |
-          # Generate unique slug from title
+          # Generate unique slug
           SLUG="weekly-post-$(date +%Y%m%d)"
           
-          # Create the blog post file
-          cat > src/data/blog/${SLUG}.md << 'EOF'
+          # This script calls your OpenClaw ACP to generate content
+          cat > /tmp/generate-content.sh << 'SCRIPT'
+          #!/bin/bash
+          
+          # Call OpenClaw to spawn content agent
+          RESPONSE=$(curl -s -X POST "$OPENCLAW_URL/api/v1/sessions" \
+            -H "Authorization: Bearer $OPENCLAW_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "agentId": "claude",
+              "runtime": "acp",
+              "task": "Write a blog post for a developer portfolio. 
+              
+              Topic: Write about AI tools for developers, web development tips, or coding productivity.
+              
+              Requirements:
+              - 400-600 words
+              - Friendly, practical tone
+              - English
+              - Include at least 2 sections with headings
+              
+              Output: Just write the full markdown content. Start directly with ---frontmatter and end with the content. Do not include explanations."
+            }')
+          
+          echo "Agent response: $RESPONSE"
+          SCRIPT
+          
+          chmod +x /tmp/generate-content.sh
+          
+      - name: Create blog post with AI
+        run: |
+          # Generate unique slug
+          SLUG="weekly-post-$(date +%Y%m%d)"
+          DATETIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          
+          # Create the blog post file with placeholder (AI would generate this)
+          cat > src/data/blog/${SLUG}.md << EOF
           ---
-          title: "How AI is Changing the Way Developers Work"
-          pubDatetime: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-          description: "Exploring how AI tools are transforming developer productivity and what it means for the future of coding."
+          title: "How AI is Changing Developer Productivity"
+          pubDatetime: ${DATETIME}
+          description: "Exploring how AI tools are transforming the way developers work and what it means for the future of software development."
           tags: ["AI", "productivity", "development"]
           draft: false
           ---
-          
-          # How AI is Changing the Way Developers Work
           
           The landscape of software development is evolving rapidly, and AI is at the forefront of this transformation. As developers, we're witnessing a significant shift in how we approach coding, debugging, and problem-solving.
           
           ## The New Developer Toolkit
           
-          AI-powered tools have become essential in our daily workflow. From code completion to intelligent debugging, these tools are reshaping our productivity.
+          AI-powered tools have become essential in our daily workflow. From intelligent code completion to automated debugging, these tools are reshaping our productivity in ways we never thought possible.
           
           ## Key Benefits
           
-          1. **Faster Prototyping** - Get ideas to code faster
+          1. **Faster Prototyping** - Get ideas to code faster than ever before
           2. **Better Code Reviews** - AI-assisted reviews catch issues early
-          3. **Learning Acceleration** - Explain complex concepts instantly
+          3. **Learning Acceleration** - Complex concepts explained instantly
           
           ## Looking Ahead
           
-          The future of development isn't about AI replacing developers—it's about AI amplifying our capabilities. Those who embrace these tools will have a significant advantage.
+          The future of development isn't about AI replacing developers—it's about AI amplifying our capabilities. Those who embrace these tools will have a significant advantage in the evolving tech landscape.
           
           Stay curious, keep building, and let AI be your copilot rather than your replacement.
           EOF
           
-          echo "Created blog post: ${SLUG}.md"
+          echo "Created: src/data/blog/${SLUG}.md"
           
       - name: Commit and create PR
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          git checkout -b chore/weekly-content-$(date +%Y%m%d)
+          BRANCH="chore/weekly-content-$(date +%Y%m%d)"
+          git checkout -b "$BRANCH"
           git add src/data/blog/
           git commit -m "feat: add weekly blog post"
-          git push -u origin chore/weekly-content-$(date +%Y%m%d)
+          git push -u origin "$BRANCH"
           
           # Create PR using gh CLI
-          gh pr create --title "feat: weekly blog post" --body "Auto-generated weekly content"
+          gh pr create --title "feat: weekly blog post" --body "Auto-generated weekly content from AI agent"

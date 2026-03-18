@@ -1,0 +1,180 @@
+---
+const GITHUB_USERNAME = "FreddieKT";
+
+type Contribution = {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
+};
+
+type ApiResponse = {
+  total: { lastYear: number };
+  contributions: Contribution[];
+};
+
+let total = 0;
+let weeks: Contribution[][] = [];
+
+try {
+  const res = await fetch(
+    `https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=last`
+  );
+  if (res.ok) {
+    const data: ApiResponse = await res.json();
+    total = data.total.lastYear ?? 0;
+
+    // Group flat contributions into Sun–Sat weeks
+    const sorted = [...data.contributions].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    let week: Contribution[] = [];
+    sorted.forEach(day => {
+      const dow = new Date(day.date + "T00:00:00").getDay(); // 0=Sun
+      if (dow === 0 && week.length) {
+        weeks.push(week);
+        week = [];
+      }
+      week.push(day);
+    });
+    if (week.length) weeks.push(week);
+  }
+} catch {
+  // fail gracefully — section hidden if fetch fails
+}
+
+// Month labels: track when the month changes across weeks
+const monthLabels: { label: string; col: number }[] = [];
+let lastMonth = -1;
+weeks.forEach((week, i) => {
+  const first = week[0];
+  if (!first) return;
+  const month = new Date(first.date + "T00:00:00").getMonth();
+  if (month !== lastMonth) {
+    monthLabels.push({
+      label: new Date(first.date + "T00:00:00").toLocaleString("en-US", {
+        month: "short",
+      }),
+      col: i,
+    });
+    lastMonth = month;
+  }
+});
+
+const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const CELL = 11;
+const GAP = 2;
+const STRIDE = CELL + GAP;
+---
+
+{
+  weeks.length > 0 && (
+    <section id="github" class="border-b border-border py-12">
+      <h2 class="text-2xl font-semibold sm:text-3xl">GitHub Activity</h2>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">
+        {total.toLocaleString()} contributions in the last year
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <div style={`min-width: ${weeks.length * STRIDE + 36}px`}>
+          {/* Month labels */}
+          <div class="relative mb-1 h-4" style="padding-left: 36px;">
+            {monthLabels.map(({ label, col }) => (
+              <span
+                class="absolute text-[10px] text-[var(--text-muted)]"
+                style={`left: ${36 + col * STRIDE}px`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          {/* Grid */}
+          <div class="flex">
+            {/* Day labels */}
+            <div
+              class="me-1 flex shrink-0 flex-col"
+              style={`gap: ${GAP}px; width: 32px;`}
+            >
+              {DAY_LABELS.map(label => (
+                <div
+                  class="flex items-center justify-end text-[10px] text-[var(--text-muted)]"
+                  style={`height: ${CELL}px;`}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* Weeks */}
+            <div class="flex" style={`gap: ${GAP}px`}>
+              {weeks.map(week => {
+                // Pad week to always 7 rows (Sun=0 … Sat=6)
+                const cells: (Contribution | null)[] = Array(7).fill(null);
+                week.forEach(day => {
+                  const dow = new Date(day.date + "T00:00:00").getDay();
+                  cells[dow] = day;
+                });
+                return (
+                  <div class="flex flex-col" style={`gap: ${GAP}px`}>
+                    {cells.map(day => (
+                      <div
+                        class={`cell level-${day?.level ?? 0}`}
+                        style={`width:${CELL}px;height:${CELL}px`}
+                        title={
+                          day
+                            ? `${day.date}: ${day.count} contribution${day.count !== 1 ? "s" : ""}`
+                            : "No data"
+                        }
+                      />
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .cell {
+    border-radius: 2px;
+  }
+
+  /* Light mode */
+  .level-0 {
+    background-color: #ebedf0;
+  }
+  .level-1 {
+    background-color: #9be9a8;
+  }
+  .level-2 {
+    background-color: #40c463;
+  }
+  .level-3 {
+    background-color: #30a14e;
+  }
+  .level-4 {
+    background-color: #216e39;
+  }
+
+  /* Dark mode */
+  :global([data-theme="dark"]) .level-0 {
+    background-color: #161b22;
+  }
+  :global([data-theme="dark"]) .level-1 {
+    background-color: #0e4429;
+  }
+  :global([data-theme="dark"]) .level-2 {
+    background-color: #006d32;
+  }
+  :global([data-theme="dark"]) .level-3 {
+    background-color: #26a641;
+  }
+  :global([data-theme="dark"]) .level-4 {
+    background-color: #39d353;
+  }
+</style>

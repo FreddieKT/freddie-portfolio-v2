@@ -30,8 +30,6 @@ const toolsByCategory = TOOLS.reduce<Record<string, string[]>>((acc, tool) => {
   acc[tool.category].push(tool.name);
   return acc;
 }, {});
-
-
 ---
 
 <Layout
@@ -192,7 +190,6 @@ const toolsByCategory = TOOLS.reduce<Record<string, string[]>>((acc, tool) => {
         }
       </ul>
     </section>
-
 
     <!-- ── Contact ── -->
     <section id="contact" class="py-12">

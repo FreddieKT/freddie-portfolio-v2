@@ -4,7 +4,6 @@
   /* ===== Override default Tailwind Typography styles ===== */
   .app-prose {
     @apply prose;
-    font-family: inherit;
 
     h1,
     h2,
@@ -12,7 +11,6 @@
     h4,
     th {
       @apply mb-3 text-foreground;
-      font-family: inherit;
     }
 
     h3 {

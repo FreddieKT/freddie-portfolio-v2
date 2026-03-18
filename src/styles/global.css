@@ -3,51 +3,33 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* ===== Light theme ===== */
+/* ===== Light theme — AstroPaper ===== */
 :root,
 html[data-theme="light"] {
-  --background: #faf8f4;
-  --foreground: #252321;
-  --accent: #0b6aa8;
-  --muted: #f1ede6;
-  --border: #e5dfd5;
+  --background: #fdfdfd;
+  --foreground: #282728;
+  --accent: #006cac;
+  --muted: #e6e6e6;
+  --border: #ece9e9;
 
-  /* Extended palette */
-  --card: #f5f1eb;
-  --panel: #f7f4ef;
-  --border-strong: #d3cabd;
-  --accent-dim: #5e7485;
-  --heading: #161514;
-  --text-muted: #6b655d;
+  /* Derived tokens */
+  --panel: #f3f3f3;
+  --border-strong: #d0cccc;
+  --text-muted: #6f6d6f;
 }
 
-/* ===== Dark theme ===== */
+/* ===== Dark theme — AstroPaper ===== */
 html[data-theme="dark"] {
-  /* Core - AstroPaper org palette */
   --background: #212737;
   --foreground: #eaedf3;
   --accent: #ff6b01;
   --muted: #343f60;
   --border: #ab4b08;
 
-  /* Extended palette */
-  --card: #2a3350;
-  --panel: #252c42;
+  /* Derived tokens */
+  --panel: #2a3350;
   --border-strong: #c45810;
-  --accent-dim: #cc5501;
-  --heading: #f0f3fa;
   --text-muted: #8b95b8;
-
-  /* Semantic colors */
-  --primary: #ff6b01;
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --error: #f87171;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {

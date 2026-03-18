@@ -33,7 +33,7 @@ html[data-theme="dark"] {
 }
 
 @theme inline {
-  --font-app: var(--font-sans);
+  --font-app: var(--font-mono);
   --font-mono-app: var(--font-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -55,8 +55,7 @@ html[data-theme="dark"] {
   body {
     @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
     font-family:
-      var(--font-sans), "Atkinson Hyperlegible", ui-sans-serif, system-ui,
-      sans-serif;
+      var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
     line-height: 1.65;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;

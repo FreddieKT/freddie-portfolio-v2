@@ -1,0 +1,83 @@
+---
+name: Weekly Content Creator
+run-name: Weekly Content Creator
+on:
+  schedule:
+    - cron: "0 9 * * 0"
+  workflow_dispatch:
+
+jobs:
+  create-content:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Create blog post
+        run: |
+          SLUG="weekly-post-$(date +%Y%m%d%H%M%S)"
+          DATETIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          echo "Generated SLUG: $SLUG"
+          echo "DATETIME: $DATETIME"
+
+          cat > src/data/blog/${SLUG}.md << 'MARKDOWN'
+          ---
+          title: "How AI is Changing Developer Productivity"
+          pubDatetime: PUBLISHDATETIME
+          description: "Exploring how AI tools are transforming the way developers work."
+          tags: ["AI", "productivity"]
+          draft: false
+          ---
+
+          The landscape of software development is evolving rapidly. AI tools have become essential in our daily workflow.
+
+          ## The New Developer Toolkit
+
+          AI-powered tools help with code completion, debugging, and problem-solving.
+
+          ## Key Benefits
+
+          1. **Faster Prototyping** - Get ideas to code faster
+          2. **Better Code Reviews** - AI catches issues early
+          3. **Learning Acceleration** - Complex concepts explained instantly
+
+          Stay curious, keep building, and let AI be your copilot.
+          MARKDOWN
+
+          sed -i "s|PUBLISHDATETIME|${DATETIME}|g" src/data/blog/${SLUG}.md
+
+          echo "Created: src/data/blog/${SLUG}.md"
+
+      - name: Commit and create PR
+        run: |
+          if ! git diff --quiet --staged; then
+            echo "Changes detected, creating PR..."
+            
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            
+            BRANCH="chore/weekly-content-$(date +%Y%m%d%H%M%S)"
+            git checkout -b "$BRANCH"
+            
+            git add src/data/blog/
+            git commit -m "feat: add weekly blog post" || echo "No changes"
+            
+            git push -u origin "$BRANCH" || echo "Push failed"
+            
+            gh pr create --title "feat: add weekly blog post" --body "Auto-generated weekly content" || echo "PR skipped"
+          else
+            echo "No content changes to commit. Skipping PR."
+          fi

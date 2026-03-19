@@ -25,24 +25,13 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Generate content via OpenClaw ACP
-        env:
-          OPENCLAW_URL: ${{ vars.OPENCLAW_URL }}
-          OPENCLAW_TOKEN: ${{ secrets.OPENCLAW_TOKEN }}
-        id: generate
+      - name: Create blog post
         run: |
           SLUG="weekly-post-$(date +%Y%m%d%H%M%S)"
           DATETIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
           echo "Generated SLUG: $SLUG"
           echo "DATETIME: $DATETIME"
-          echo "SLUG=${SLUG}" >> $GITHUB_OUTPUT
-          echo "DATETIME=${DATETIME}" >> $GITHUB_OUTPUT
-
-      - name: Create blog post
-        run: |
-          SLUG="${{ steps.generate.outputs.SLUG }}"
-          DATETIME="${{ steps.generate.outputs.DATETIME }}"
 
           cat > src/data/blog/${SLUG}.md << 'MARKDOWN'
           ---

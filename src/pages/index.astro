@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
@@ -9,6 +10,7 @@ import { SITE } from "@/config";
 import { PROFILE } from "@/data/profile";
 import { EXPERIENCE } from "@/data/experience";
 import ContactForm from "@/components/ContactForm.astro";
+import profileImage from "@/assets/images/profile.webp";
 
 // Blog posts — latest 5
 const allPosts = await getCollection("blog");
@@ -47,12 +49,13 @@ try {
     <section id="hero" class="border-b border-border py-10 sm:py-14">
       <div class="grid gap-8 md:grid-cols-[160px_1fr] md:items-start">
         <a href="/about" class="mx-auto block w-28 shrink-0 sm:mx-0 sm:w-40">
-          <img
-            src={PROFILE.avatar}
+          <Image
+            src={profileImage}
             alt={PROFILE.name}
             fetchpriority="high"
-            width="160"
-            height="160"
+            loading="eager"
+            width={160}
+            height={160}
             class="h-auto w-full object-cover object-top"
           />
         </a>

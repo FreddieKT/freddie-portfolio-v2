@@ -4,7 +4,7 @@ export const SITE = {
   profile: "https://ktt.dev/",
   desc: "Writing on software, AI tooling, and practical automation by Khant Thura Thaung.",
   title: "Khant Thura Thaung",
-  navTitle: "KTT",
+  navTitle: "Khant Thura Thaung",
   ogImage: "og.png",
   lightAndDarkMode: true,
   postPerIndex: 4,

@@ -1,0 +1,9 @@
+{
+  "title": "How I Turned a Manual Workflow Into a Small Automation",
+  "description": "A sample JSON payload for the blog publisher automation.",
+  "tags": ["automation", "workflow", "blog"],
+  "draft": false,
+  "featured": false,
+  "publishWindowMinutes": 240,
+  "body": "# How I Turned a Manual Workflow Into a Small Automation\n\nThis post was generated from a JSON payload and written by the automation script.\n\n## Why this matters\n\nA lightweight content pipeline makes it easier to publish consistently without editing the site by hand every time.\n\n## What the automation does\n\n- Reads structured JSON\n- Converts it into Astro-compatible markdown\n- Schedules the publish time inside the frontmatter\n- Commits the result to a dedicated Git branch\n\n## Next step\n\nHook this script up to a scheduler or a Hermes sub-agent so the content can be generated and queued automatically."
+}

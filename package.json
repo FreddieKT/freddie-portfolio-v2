@@ -10,7 +10,9 @@
     "astro": "astro",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "blog:publish": "node automation/publish-blog-post.mjs",
+    "blog:publish:dry-run": "node automation/publish-blog-post.mjs --dry-run --input automation/examples/blog-post.example.json"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.14",

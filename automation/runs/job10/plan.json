@@ -1,0 +1,11 @@
+{
+  "job_id": "job10",
+  "plan": "Publish blog post 'Why I spend 4 hours automating a 5-minute task'",
+  "steps": [
+    "Checkout automation branch",
+    "Add blog post and artifacts",
+    "Commit with descriptive message",
+    "Push to origin for review"
+  ],
+  "status": "completed"
+}

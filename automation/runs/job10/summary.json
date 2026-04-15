@@ -1,0 +1,25 @@
+{
+  "job_id": "job10",
+  "created_at": "2026-04-15T17:38:04Z",
+  "blog_post": "src/data/blog/building-self-improving-automation-pipeline-job10.md",
+  "publish_script": "automation/runs/job10/publish.sh",
+  "status": "ready_with_new_content",
+  "description": "Meta-automation: Blog post about the automation system itself",
+  "artifacts": [
+    "publish.sh",
+    "building-self-improving-automation-pipeline-job10.md",
+    "summary.json",
+    "plan.json"
+  ],
+  "blog_post_size_bytes": 3023,
+  "git_branch": "automation/blog-post-publisher-job10",
+  "content_type": "meta_automation",
+  "gh_integration": {
+    "enabled": true,
+    "pr_auto_create": true,
+    "labels": ["automation", "blog", "meta"],
+    "pr_title": "Blog: Building a Self-Improving Automation Pipeline: Lessons from Job #10",
+    "requires_gh_cli": true
+  },
+  "notes": "Repurposed from publishing existing content to creating new meta-automation content"
+}
